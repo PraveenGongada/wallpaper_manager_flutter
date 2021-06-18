@@ -1,7 +1,6 @@
 name: wallpaper_manager_flutter
-description: A Plugin to set Wallpaper.
+description: A Plugin to set Wallpaper for Home Screen,Lock Screen and Both Screens on Android device from system file or cached file inside the app directory.
 version: 0.0.1
-author: Praveen Kumar
 homepage: https://github.com/Praveen-0603/wallpaper_manager_flutter
 
 environment:
