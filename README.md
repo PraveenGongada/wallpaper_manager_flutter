@@ -1,6 +1,6 @@
 # wallpaper_manager_flutter
 
-A new flutter plugin project.
+A Plugin to set Wallpaper of HomeScreen,LockScreen and Both Screen without lag even for large Images
 
 ## Getting Started
 
