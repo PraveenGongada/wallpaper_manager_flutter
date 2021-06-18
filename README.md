@@ -7,13 +7,15 @@ A Plugin to set Wallpaper of HomeScreen,LockScreen and Both Screen without lag e
 
 In the pubspec.yaml of your flutter project, add the following dependency:
 
+```dart
 dependencies:
   wallpaper_manager_flutter: ^0.0.1
-
+```
 In your library add the following import:
 
+```dart
   import 'package:wallpaper_manager_flutter/wallpaper_manager_flutter.dart';
-
+```
 # Usage
 
 ## Set wallpaper from system file
@@ -42,6 +44,8 @@ In your library add the following import:
 ```dart
   import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 ```
+
+Now in pass the image url to the cache manager and await cachedimage and the pass the cached image.
 
 ```dart
 var cachedimage = await DefaultCacheManager().getSingleFile(url);
