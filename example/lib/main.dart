@@ -1,59 +1,106 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'dart:async';
-
-import 'package:flutter/services.dart';
+import 'package:flutter_cache_manager/flutter_cache_manager.dart';
 import 'package:wallpaper_manager_flutter/wallpaper_manager_flutter.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(
+    MaterialApp(
+      home: HomeScreen(),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData.dark(),
+    ),
+  );
 }
 
-class MyApp extends StatefulWidget {
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({Key? key}) : super(key: key);
+
   @override
-  _MyAppState createState() => _MyAppState();
+  _HomeScreenState createState() => _HomeScreenState();
 }
 
-class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+class _HomeScreenState extends State<HomeScreen> {
+  final imageurl =
+      'https://unsplash.com/photos/AnBzL_yOWBc/download?force=true&w=2400';
+  //'https://unsplash.com/photos/1zTg4KT4EtE/download?force=true&w=2400';
 
-  @override
-  void initState() {
-    super.initState();
-    initPlatformState();
-  }
+  // Image Dimensions are 2400 x 3598
 
-  // Platform messages are asynchronous, so we initialize in an async method.
-  Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    // We also handle the message potentially returning null.
+  Future<void> _setwallpaper(location) async {
+    var file = await DefaultCacheManager().getSingleFile(imageurl);
     try {
-      platformVersion =
-          await WallpaperManagerFlutter.platformVersion ?? 'Unknown platform version';
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
+      WallpaperManagerFlutter().setwallpaperfromFile(file, location);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Wallpaper updated'),
+        ),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error Setting Wallpaper'),
+        ),
+      );
+      print(e);
     }
-
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(
-          title: const Text('Plugin example app'),
-        ),
-        body: Center(
-          child: Text('Running on: $_platformVersion\n'),
-        ),
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Wallpaper Manager Example'),
+        centerTitle: true,
+      ),
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            flex: 4,
+            child: Container(
+              width: MediaQuery.of(context).size.width,
+              child: CachedNetworkImage(
+                imageUrl: imageurl,
+                fit: BoxFit.fill,
+                placeholder: (context, url) => Center(
+                  child: CircularProgressIndicator(),
+                ),
+                errorWidget: (context, url, uri) => Center(
+                  child: Icon(
+                    Icons.error_outline_rounded,
+                    color: Colors.red,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Expanded(
+            flex: 1,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: <Widget>[
+                ElevatedButton(
+                  onPressed: () {
+                    _setwallpaper(WallpaperManagerFlutter.HOME_SCREEN);
+                  },
+                  child: Text('Home Screen'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _setwallpaper(WallpaperManagerFlutter.LOCK_SCREEN);
+                  },
+                  child: Text('Lock Screen'),
+                ),
+                ElevatedButton(
+                  onPressed: () {
+                    _setwallpaper(WallpaperManagerFlutter.BOTH_SCREENS);
+                  },
+                  child: Text('Both Screens'),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
