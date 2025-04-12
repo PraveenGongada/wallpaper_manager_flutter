@@ -1,0 +1,12 @@
+# Exclude all .idea files and folders
+
+.idea/
+\*.iml
+
+# Only ignore pubspec.lock for packages, not apps
+
+pubspec.lock
+
+# Ignore demo gif
+
+doc/demo.gif

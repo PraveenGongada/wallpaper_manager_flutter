@@ -1,62 +1,46 @@
-import 'dart:async';
-import 'dart:io';
-import 'dart:typed_data';
-
-import 'package:flutter/services.dart';
+import 'wallpaper_manager_flutter_platform_interface.dart';
 
 class WallpaperManagerFlutter {
-  // Defining Channel
-  static const MethodChannel _channel = const MethodChannel('setwallpaper');
+  /// Constants for wallpaper locations.
+  ///
+  /// These constants represent the different locations where the wallpaper can be set:
+  /// - [homeScreen]: Sets the wallpaper on the home screen.
+  /// - [lockScreen]: Sets the wallpaper on the lock screen.
+  /// - [bothScreens]: Sets the wallpaper on both the home and lock screens.
+  static const int homeScreen = 1;
+  static const int lockScreen = 2;
+  static const int bothScreens = 3;
 
-  // Function to check working of method channels
-  static Future<String?> get platformVersion async {
-    // String to store the version number
-    final String? version = await _channel.invokeMethod('getPlatformVersion');
-    // return Version number
-    return version;
-  }
+  /// Sets the wallpaper on a specific screen.
+  ///
+  /// This method allows you to set the wallpaper either on the home screen, lock screen, or both.
+  /// It ensures that the location provided is valid and then attempts to set the wallpaper.
+  ///
+  /// [imageFile] is the image file that will be set as the wallpaper.
+  /// [location] indicates where the wallpaper should be set. It can be one of:
+  /// - [homeScreen] (1)
+  /// - [lockScreen] (2)
+  /// - [bothScreens] (3)
+  ///
+  /// Throws an [ArgumentError] if the [location] is not one of the valid values.
+  /// Returns a [Future<String?>] that resolves to a status message or an error message.
+  Future<bool> setWallpaper(dynamic imageFile, int location) async {
+    // Check if the location is valid
+    if (location != homeScreen &&
+        location != lockScreen &&
+        location != bothScreens) {
+      throw ArgumentError('Invalid location value provided: $location');
+    }
 
-  static const int HOME_SCREEN = 1;
-  // To Set wallpaper for HomeScreen.
-
-  static const int LOCK_SCREEN = 2;
-  // To Set wallpaper for Lock Screen.
-
-  static const int BOTH_SCREENS = 3;
-  // To Set wallpaper for Both Screens.
-
-  // Function to set Wallpaper
-  Future<void> setwallpaperfromFile(imagefile, location) async {
-    Uint8List imagebyte;
-
-    // Functon to convert image to bytes
-    _readFileByte(imagefile.path).then(
-      (bytesData) {
-        imagebyte = bytesData;
-
-        // Sending bytedata and location to Platform channel
-        _channel.invokeMethod(
-          'setWallpaper',
-          {
-            'data': imagebyte,
-            'location': location,
-          },
-        );
-      },
-    );
-  }
-
-  // Process of Converting image to bytes
-
-  _readFileByte(String filePath) async {
-    Uri myUri = Uri.parse(filePath);
-    File imagefile = new File.fromUri(myUri);
-    Uint8List? bytes;
-    await imagefile.readAsBytes().then((value) {
-      bytes = Uint8List.fromList(value);
-    });
-
-    // returns bytes.
-    return bytes;
+    try {
+      // Attempt to set the wallpaper using the WallpaperManagerFlutterPlatform
+      return await WallpaperManagerFlutterPlatform.instance.setWallpaper(
+        imageFile,
+        location,
+      );
+    } catch (e) {
+      // Re-throw any error that occurs during wallpaper setting
+      rethrow;
+    }
   }
 }
